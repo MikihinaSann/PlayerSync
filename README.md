@@ -5,6 +5,7 @@ PlayerSync is a Minecraft Forge mod that synchronizes player data across multipl
 ## Mod Support
 *   [Curios API](https://www.curseforge.com/minecraft/mc-mods/curios)
 *   [Sophisticated Backpacks](https://www.curseforge.com/minecraft/mc-mods/sophisticated-backpacks)
+*   [Pufferfish's Skills](https://www.curseforge.com/minecraft/mc-mods/puffish-skills) via the addon sync API
 
 Any other mods support is also possible.
 

@@ -40,6 +40,7 @@ import vip.fubuki.playersync.PlayerSync;
 import vip.fubuki.playersync.config.JdbcConfig;
 import vip.fubuki.playersync.sync.addons.CuriosCache;
 import vip.fubuki.playersync.sync.addons.ModsSupport;
+import vip.fubuki.playersync.sync.addons.PlayerSyncAddonManager;
 import vip.fubuki.playersync.util.JDBCsetUp;
 import vip.fubuki.playersync.util.LocalJsonUtil;
 import vip.fubuki.playersync.util.PSThreadPoolFactory;
@@ -338,6 +339,7 @@ public class VanillaSync {
             }
 
             modsSupport.doBackPackRestore(serverPlayer);
+            PlayerSyncAddonManager.onPlayerJoin(serverPlayer);
 
             serverPlayer.addTag("player_synced");
 
@@ -545,6 +547,9 @@ public class VanillaSync {
         JDBCsetUp.executeUpdate("UPDATE server_info SET last_update=" + System.currentTimeMillis() + " WHERE id=" + JdbcConfig.SERVER_ID.get());
         if (!event.getEntity().getTags().contains("player_synced")) return;
         store(event.getEntity(), false);
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            PlayerSyncAddonManager.onPlayerSave(serverPlayer);
+        }
     }
 
     @SubscribeEvent
@@ -567,6 +572,9 @@ public class VanillaSync {
         String player_uuid = event.getEntity().getUUID().toString();
         JDBCsetUp.executeUpdate("UPDATE player_data SET online= '0' WHERE uuid='" + player_uuid + "'");
         store(event.getEntity(), false);
+        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+            PlayerSyncAddonManager.onPlayerSave(serverPlayer);
+        }
     }
 
     @SubscribeEvent
@@ -772,6 +780,7 @@ public class VanillaSync {
                             try {
                                 // Call the same store method used in logout and file save events.
                                 store(player, false);
+                                PlayerSyncAddonManager.onPlayerSave(player);
                             } catch (Exception e) {
                                 PlayerSync.LOGGER.error("Error auto-saving player " + player.getUUID(), e);
                             }

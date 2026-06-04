@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import vip.fubuki.playersync.config.JdbcConfig;
 import vip.fubuki.playersync.sync.ChatSync;
 import vip.fubuki.playersync.sync.VanillaSync;
+import vip.fubuki.playersync.sync.addons.PlayerSyncAddonManager;
 import vip.fubuki.playersync.util.JDBCsetUp;
 
 import java.sql.*;
@@ -191,6 +192,8 @@ public class PlayerSync {
         rsAdvCol.close();
         // ----- END NEW BLOCK -----
 
+        PlayerSyncAddonManager.initialize();
+
         try {
             JDBCsetUp.executeUpdate("UPDATE player_data SET online=0 WHERE last_server=" + JdbcConfig.SERVER_ID.get() +" AND online=1 LIMIT 1000");
         } catch (Exception e) {
@@ -201,6 +204,7 @@ public class PlayerSync {
 
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event){
+        PlayerSyncAddonManager.onServerStopping();
         ChatSync.shutdown();
     }
 
