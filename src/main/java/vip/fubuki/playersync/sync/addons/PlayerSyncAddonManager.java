@@ -83,5 +83,8 @@ public final class PlayerSyncAddonManager {
         if (ModList.get().isLoaded("puffish_skills") && JdbcConfig.SYNC_SKILLSMOD.get()) {
             ADDONS.add(new SkillsModAddon());
         }
+        if (ModList.get().isLoaded("epicfight") && JdbcConfig.SYNC_EPICFIGHT.get()) {
+            ADDONS.add(new EpicFightAddon());
+        }
     }
 }

@@ -21,6 +21,7 @@ public class JdbcConfig {
     public static final ForgeConfigSpec.BooleanValue SYNC_CHAT;
     public static final ForgeConfigSpec.BooleanValue IS_CHAT_SERVER;
     public static final ForgeConfigSpec.BooleanValue SYNC_SKILLSMOD;
+    public static final ForgeConfigSpec.BooleanValue SYNC_EPICFIGHT;
     public static final ForgeConfigSpec.ConfigValue<String> ITEM_PLACEHOLDER_TITLE_OVERRIDE;
     public static final ForgeConfigSpec.ConfigValue<String> ITEM_PLACEHOLDER_DESCRIPTION_OVERRIDE;
     public static final ForgeConfigSpec.BooleanValue KICK_WHEN_ALREADY_ONLINE;
@@ -48,6 +49,8 @@ public class JdbcConfig {
         IS_CHAT_SERVER = COMMON_BUILDER.comment("Whether recieve messages from other servers as host").define("IsChatServer",false);
         SYNC_SKILLSMOD = COMMON_BUILDER.comment("Whether synchronize Pufferfish's Skills data when the mod is installed")
                 .define("sync_skillsmod", true);
+        SYNC_EPICFIGHT = COMMON_BUILDER.comment("Whether synchronize Epic Fight skill data when the mod is installed")
+                .define("sync_epicfight", true);
         KICK_WHEN_ALREADY_ONLINE = COMMON_BUILDER.comment("Whether to kick player when already online on another server")
                 .define("kick_when_already_online", true);
         CHAT_SERVER_IP = COMMON_BUILDER.define("ChatServerIP","127.0.0.1");

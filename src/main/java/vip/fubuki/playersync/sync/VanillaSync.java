@@ -265,6 +265,7 @@ public class VanillaSync {
                 store(event.getEntity(), true);
                 JDBCsetUp.executeUpdate("UPDATE server_info SET last_update=" + System.currentTimeMillis() + " WHERE id=" + JdbcConfig.SERVER_ID.get());
                 JDBCsetUp.executeUpdate("UPDATE player_data SET online= '1',last_server=" + JdbcConfig.SERVER_ID.get() + " WHERE uuid='" + player_uuid + "'");
+                serverPlayer.addTag("player_synced");
                 rs1.close();
                 qr1.close();
                 PlayerSync.LOGGER.info("New player detected,init completed.");
@@ -674,6 +675,7 @@ public class VanillaSync {
         // Advancements
         File advancements = null;
         byte[] advancementBytes = new byte[0];
+        boolean hasAdvancementsData = false;
         if (JdbcConfig.SYNC_ADVANCEMENTS.get()) {
             File gameDir = Objects.requireNonNull(player.getServer()).getServerDirectory();
             final MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
@@ -692,25 +694,32 @@ public class VanillaSync {
                     }
                 }
             }
-            if (!advancements.exists()) {
+            if (advancements == null) {
+                PlayerSync.LOGGER.warn("No advancements file resolved for player {} during save. Keeping the previously stored advancements data.", player_uuid);
+            } else if (!advancements.exists()) {
                 PlayerSync.LOGGER.warn("Advancements file for " + player_uuid + " does not exist (yet).");
             }
 
             if (advancements != null && advancements.exists()) {
                 PlayerSync.LOGGER.debug("Storing advancements for " + player_uuid + " from " + advancements.toPath());
                 advancementBytes = Files.readAllBytes(advancements.toPath());
+                hasAdvancementsData = true;
             } else {
-                PlayerSync.LOGGER.error("Unable to save advancements for player " + player_uuid);
+                PlayerSync.LOGGER.warn("Skipping advancements save for player {} because no readable advancements file was found.", player_uuid);
             }
         }
         String json = new String(advancementBytes, StandardCharsets.UTF_8);
-        PlayerSync.LOGGER.trace("Storing advancements for player " + player_uuid + ": " + json);
+        if (hasAdvancementsData) {
+            PlayerSync.LOGGER.trace("Storing advancements for player " + player_uuid + ": " + json);
+        }
 
         // SQL Operation for player data
         if (init) {
             JDBCsetUp.executeUpdate("INSERT INTO player_data (uuid,armor,inventory,enderchest,advancements,effects,xp,food_level,health,score,left_hand,cursors,online) VALUES ('" + player_uuid + "','" + equipment + "','" + inventoryMap + "','" + ender_chest + "','" + json + "','" + effectMap + "','" + XP + "','" + food_level + "','" + health + "','" + score + "','" + left_hand + "','" + cursors + "',online=true)");
-        } else {
+        } else if (hasAdvancementsData) {
             JDBCsetUp.executeUpdate("UPDATE player_data SET inventory = '" + inventoryMap + "',armor='" + equipment + "' ,xp='" + XP + "',effects='" + effectMap + "',enderchest='" + ender_chest + "',score='" + score + "',food_level='" + food_level + "',health='" + health + "',advancements='" + json + "',left_hand='" + left_hand + "',cursors='" + cursors + "' WHERE uuid = '" + player_uuid + "'");
+        } else {
+            JDBCsetUp.executeUpdate("UPDATE player_data SET inventory = '" + inventoryMap + "',armor='" + equipment + "' ,xp='" + XP + "',effects='" + effectMap + "',enderchest='" + ender_chest + "',score='" + score + "',food_level='" + food_level + "',health='" + health + "',left_hand='" + left_hand + "',cursors='" + cursors + "' WHERE uuid = '" + player_uuid + "'");
         }
     }
 
